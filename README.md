@@ -10,9 +10,9 @@ My name is Eric Duvic. As a fullstack/devops engineer, I feel like it's time to 
 Concourse Reports is comprised of three pieces:
 - A Python application that provides functionality for storing, parsing, and maintaining JUnit test results. This includes shell commands as well as a RESTful API.
 - A Dockerfile representing a Concourse resource that leverages the Python application to store JUnit test results generated from pipeline tasks.
-- An Ember web frontend that gives users a graphical view and management of JUnit test results.
+- An Preact web frontend that gives users a graphical view and management of JUnit test results.
 
 ## Todo
 - [ ] Add documentation on how to install all of this.
 - [ ] Add unit tests for Python code
-- [ ] Create frontend in Ember
+- [ ] Create frontend in Preact
