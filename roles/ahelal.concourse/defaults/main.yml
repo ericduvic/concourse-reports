@@ -1,0 +1,84 @@
+---
+# Concourse version
+concourseci_version                         : "v3.6.0"
+
+## Dir structure
+concourseci_base_dir                        : "/opt/concourseci"
+concourseci_bin_dir                         : "{{ concourseci_base_dir }}/bin"
+concourseci_worker_dir                      : "{{ concourseci_base_dir }}/worker"
+concourseci_ssh_dir                         : "{{ concourseci_base_dir }}/.ssh"
+
+## Concourse log
+concourseci_log_dir                         : "/var/log/concourse"
+concourseci_log_worker                      : "{{ concourseci_log_dir }}/concourseci_worker.log"
+concourseci_log_web                         : "{{ concourseci_log_dir }}/concourseci_web.log"
+
+## Concourse User
+concourseci_user                            : "concourseci"
+concourseci_group                           : "concourseci"
+
+
+## Amount of tries to retire running worker when process management stops daemon
+concourseci_worker_retire_tries             : 10
+
+## New config dictionary based.
+## This dictionary is merged with 'concourse_web_options' dictionary, make your overrides there!
+## e.g.
+## concourse_web_options:
+##   CONCOURSE_BIND_IP                       : "10.0.0.1"
+##
+concourse_web_options                        : { }
+
+concourse_web_options_default                :
+  CONCOURSE_BIND_IP                          : "0.0.0.0"
+  CONCOURSE_TSA_HOST                         : "{{ groups.get(concourseci_web_group, [''])[0] }}" # By default we pick the first host in web group
+  CONCOURSE_TSA_BIND_IP                      : "0.0.0.0"
+  CONCOURSE_TSA_BIND_PORT                    : "2222"
+  CONCOURSE_TSA_AUTHORIZED_KEYS              : "{{ concourseci_ssh_dir }}/tsa_authorization"
+  CONCOURSE_TSA_HOST_KEY                     : "{{ concourseci_ssh_dir }}/tsa"
+  CONCOURSE_SESSION_SIGNING_KEY              : "{{ concourseci_ssh_dir }}/session_signing"
+
+## This dictionary is merged with 'concourse_worker_options' dictionary, make your overrides there!
+## e.g.
+## concourse_worker_options:
+##   CONCOURSE_NAME                          : "my-worker"
+##
+concourse_worker_options                     : { }
+
+concourse_worker_options_default             :
+  CONCOURSE_WORK_DIR                         : "{{ concourseci_worker_dir }}"
+  CONCOURSE_TSA_WORKER_PRIVATE_KEY           : "{{ concourseci_ssh_dir }}/worker"
+  CONCOURSE_SESSION_SIGNING_KEY              : "{{ concourseci_ssh_dir }}/session_signing"
+  CONCOURSE_TSA_HOST_KEY                     : "{{ concourseci_ssh_dir }}/tsa"
+  CONCOURSE_TSA_HOST                         : "{{ concourse_web_options['CONCOURSE_TSA_HOST'] | default(concourse_web_options_default['CONCOURSE_TSA_HOST']) }}"
+  CONCOURSE_TSA_PORT                         : "{{ concourse_web_options['CONCOURSE_TSA_BIND_PORT'] | default(concourse_web_options_default['CONCOURSE_TSA_BIND_PORT']) }}"
+  CONCOURSE_TSA_PUBLIC_KEY                   : "{{ concourse_web_options['CONCOURSE_TSA_HOST_KEY'] | default(concourse_web_options_default['CONCOURSE_TSA_HOST_KEY']) }}.pub"
+
+
+## Ansible Groups to form clusters
+concourseci_web_group                       : "concourse-web"
+concourseci_worker_group                    : "concourse-worker"
+
+## Management
+concourseci_manage_url                      : "{{ concourse_web_options_combined['CONCOURSE_EXTERNAL_URL'] | default('http://127.0.0.1:8080') }}"
+## Write some comments
+concourseci_manage_credential_user          : "{{ concourse_web_options_combined['CONCOURSE_BASIC_AUTH_USERNAME'] }}"
+concourseci_manage_credential_password      : "{{ concourse_web_options_combined['CONCOURSE_BASIC_AUTH_PASSWORD'] }}"
+
+### Management Teams
+concourseci_manage_teams                    : False
+concourseci_teams                           : []
+
+### Management Pipelines ( still not working )
+concourseci_manage_pipelines                : False
+
+## Reboot when updating kernel (we disable this for test :( on docker)
+concourseci_reboot                          : True
+
+## SSH
+concourseci_worker_position                 : "{{ groups[concourseci_worker_group].index(inventory_hostname)| default(0) }}"
+concourseci_key_worker_public               : "{{ concourseci_worker_keys[concourseci_worker_position | int ].public}}"
+concourseci_key_worker_private              : "{{ concourseci_worker_keys[concourseci_worker_position | int ].private}}"
+
+# temp solution to systemV issue and ansible :(
+concourse_ignore_errors                       : "{{ ansible_lsb['codename'] == 'xenial' | default(False)}}"

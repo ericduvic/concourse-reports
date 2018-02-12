@@ -1,0 +1,29 @@
+---
+- name: Configure Server
+  hosts: all
+  become: true
+  become_method: sudo
+  roles:
+  - role: angstwad.docker_ubuntu
+    kernel_update_and_reboot_permitted: yes
+  - role: ANXS.postgresql
+    postgresql_users:
+    - name: concourse
+      pass: concourse
+      encrypted: no
+    postgresql_databases:
+    - name: concourse
+      owner: concourse
+  - role: ahelal.concourse
+    concourse_web_options:
+        CONCOURSE_POSTGRES_DATABASE: "concourse"
+        CONCOURSE_POSTGRES_HOST: "127.0.0.1"
+        CONCOURSE_POSTGRES_PASSWORD: "concourse"
+        CONCOURSE_POSTGRES_SSLMODE: "disable"
+        CONCOURSE_POSTGRES_USER: "concourse"
+
+  tasks:
+  - name: Upgrade pip
+    pip: name=pip extra_args=--upgrade
+  - name: Install Ansible
+    pip: name=ansible

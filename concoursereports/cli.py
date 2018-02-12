@@ -27,7 +27,7 @@ def concourse_resource_check():
 @click.argument('destination')
 def concourse_resource_in(destination):
     """Function to acquire a resource.
-    
+
     No-op'd because this resource is not intended to be used in any jobs/tasks.
     """
     sys.stdout.write(json.dumps({}))

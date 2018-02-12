@@ -1,0 +1,33 @@
+---
+language: python
+python: "2.7"
+services:
+  - docker
+
+env:
+  - TEST_COMMAND="bundle exec kitchen test ubuntu1404-20"
+  - TEST_COMMAND="bundle exec kitchen test ubuntu1404-24"
+  - TEST_COMMAND="bundle exec kitchen test ubuntu1604-20"
+  - TEST_COMMAND="bundle exec kitchen test ubuntu1604-21"
+  - TEST_COMMAND="bundle exec kitchen test ubuntu1604-22"
+  - TEST_COMMAND="bundle exec kitchen test ubuntu1604-23"
+  - TEST_COMMAND="bundle exec kitchen test ubuntu1604-24"
+
+before_install:
+  # Make sure everything's up to date.
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq python-apt python-pycurl git python-pip ruby ruby-dev build-essential autoconf
+  - gem install bundler
+
+install:
+  - sudo locale-gen en_US.UTF-8
+  - sudo dpkg-reconfigure locales
+  - bash ./test/ansible-setup.sh
+  - bash ./test/setup_roles.sh
+  - bundle install
+
+script:
+    - LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 $TEST_COMMAND
+
+after_success:
+    - echo "Success"

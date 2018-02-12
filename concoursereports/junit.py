@@ -55,4 +55,4 @@ class JUnitReport(object):
     def load_report(cls, filename):
         """"""
         with open(filename) as report:
-            cls(report.read())
+            return cls(report.read())

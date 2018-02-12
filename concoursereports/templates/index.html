@@ -1,0 +1,24 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JUnit Reports</title>
+</head>
+<body>
+    <table>
+        <th>
+            <td>Status</td>
+            <td>Build #</td>
+            <td>Timestamp</td>
+            <td></td>
+        </th>
+        {% for build in builds %}
+        <tr>
+            <td>{{ build.status.success_count }} - {{ build.status.warn_count }} - {{ build.status.fail_count }}</td>
+            <td>{{ build.id }}</td>
+            <td>{{ build.timestamp }}</td>
+            <td>Todo: Actions</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
